@@ -1,59 +1,26 @@
-Welcome to the My senior design project a Senior Design from the University of Louisiana at Lafayette. This system automates student bus attendance using RFID scanning, GPS tracking, and secure client-server communication to improve student safety and operational efficiency for school transportation.
+Senior Design project developed at the University of Louisiana at Lafayette. This system is designed to automate and streamline student attendance on school buses using RFID technology, GPS tracking, and client-server communication.
 
+Our goal is to improve student safety and accountability by enabling real-time monitoring of when and where students board or exit a school bus. SmartBus provides schools and parents with live updates and reliable records, reducing manual attendance errors and enhancing route visibility.
 
+Key Features:
+🔄 RFID-based Onboarding/Offboarding
 
-📌 Project Overview
-SmartBus is designed to:
+📍 Live GPS Tracking
 
-Automatically detect when students board or leave the bus using RFID cards
+🛠 Python-based Server-Client Architecture
 
-Capture real-time GPS data
+🔐 Tailscale VPN for Secure Communication
 
-Log and transmit this data securely to a centralized server
+📊 Daily Logging & MySQL Integration
 
-Allow schools to track student activity, by time and location
+🖥️ Admin Portal Access (Future Scope)
 
-Provide a foundation for future parent and admin access portals
+This project includes:
 
-⚙️ Features
-✅ RFID Scanning via serial-based reader (Yanzeo SR681)
+Raspberry Pi-based bus clients that read RFID tags and send data.
 
-🌍 GPS Tracking over UART
+A centralized server that logs, verifies, and timestamps student activity.
 
-🔗 Persistent TCP Client-Server Communication
+MySQL database integration for student record lookups.
 
-🗃️ MySQL Database Integration
-
-📁 Automatic Daily Logging
-
-🔒 Secure Networking with Tailscale VPN
-
-⏱️ Debounce Logic to Prevent Duplicate Reads
-
-
-📦 Project Structure
-
-SmartBus/
-
-├── Client/                # Raspberry Pi client-side code
-
-│   └── v3.0.0-20250324-alpha.py
-
-├── Server/                # Python server for data handling and logging
-
-│   └── v2.0.0-20250417-alpha.py
-
-├── Database/              # MySQL schema and utility scripts
-
-├── Docs/                  # Design documents and setup instructions
-
-└── README.md              # This file
-
-
-👨‍💻 Authors
-
-Roland Simmons
-
-Madison Lee
-
-Kenrick Williams
+Logging tools and authentication mechanisms for school-specific access.
