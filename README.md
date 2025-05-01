@@ -24,3 +24,11 @@ A centralized server that logs, verifies, and timestamps student activity.
 MySQL database integration for student record lookups.
 
 Logging tools and authentication mechanisms for school-specific access.
+
+👨‍💻 Authors Spring 25'
+
+Roland Simmons
+
+Madison Lee
+
+Kenrick Williams
