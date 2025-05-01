@@ -10,10 +10,12 @@
 
 #
 # Description:
-# This software interfaces with a Yanzeo SR681 RFID scanner to detect and 
-# process RFID card data for an access control system. It reads serial data 
-# from the scanner, extracts relevant RFID tag information, and logs detections.
-#
+# # This software functions as the main server for the Schoolbus Automation system. It listens
+# for connections from bus-mounted clients over TCP, processes incoming RFID and
+# GPS data, logs student attendance, and stores records in a MySQL database. It
+# also provides a text-based admin interface for managing students, querying logs,
+# and interacting with connected buses.
+
 # Dependencies:
 # - Python 3.x
 # - pyserial library (`pip install pyserial`)
@@ -66,16 +68,22 @@ rfid_timestamps = {}
 client_bus_map = {}  # IP to Bus ID 
 
 # --------------- MYSQL CONNECTION --------------- #
+# Establishes and returns a connection to the local MySQL database.
+# Update the credentials and database name as needed.
+
 def connect():
     return pymysql.connect(
         host="localhost",
         user="root",
         password="YOUR PASSWORD",
-        database="SchoolDB"
+        database="YOUR DATABASE"
     )
 
 
 # --------------- HANDLE CLIENT CONNECTION --------------- #
+# Handles communication with a connected bus client.
+# Processes handshake messages, pings, and RFID+GPS data,
+# logs valid attendance entries, and manages client disconnection.
 
 def handle_client(client_socket, addr):
     server_logs.put(f"🔌 Connected to {addr}")
@@ -136,6 +144,8 @@ def handle_client(client_socket, addr):
 
 
 # --------------- SERVER THREAD STARTUP --------------- #
+# Starts the TCP server to accept incoming client (bus) connections.
+# Spawns a new thread to handle each connected client.
 
 def start_server_thread():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -150,6 +160,8 @@ def start_server_thread():
 
 
 # --------------- Database Functions --------------- #
+# Retrieves the student name associated with a given RFID tag
+# from the MySQL database. Returns None if not found.
 
 def get_student_name(rfid):
     conn = connect()
@@ -163,6 +175,8 @@ def get_student_name(rfid):
         conn.close()
 
 # ---------------- Log Attendance Section ----------- # 
+# Logs a student's attendance entry with timestamp, name, status, and GPS data
+# into a daily text file inside the "logs" directory.
 
 def log_attendance(name, status, gps):
     today = datetime.now().strftime("%Y-%m-%d")
@@ -172,6 +186,8 @@ def log_attendance(name, status, gps):
         f.write(f"{datetime.now().strftime('%H:%M:%S')} | {name} | {status} | {gps}\n")
 
 # --------------- Add a Student Section ------------ # 
+# Adds a new student to the MySQL database via a text-based UI.
+# Prompts for name, RFID, bus ID, and school, then stores the data with error handling.
 
 def add_student(stdscr):
     """Add a student with robust feedback"""
@@ -263,6 +279,8 @@ def add_student(stdscr):
             return
 
 # ----------- Delete a student from Database Section --------------- # 
+# Deletes a student from the database by name using a text-based interface.
+# Displays matching records for confirmation before removal.
 
 def delete_student(stdscr):
     """Delete a student by name with validation"""
@@ -331,7 +349,8 @@ def delete_student(stdscr):
 
 
 # --------------------- Search Student Section --------------- # 
-
+# Searches for a student by name and displays their most recent bus activity
+# using today's attendance log and database lookup.
 
 def search_student(stdscr):
     curses.echo()
@@ -390,7 +409,8 @@ def search_student(stdscr):
 
 
 
-
+# Safely truncates a string to fit within a specified display width,
+# accounting for wide or multi-width characters (e.g. emojis, CJK).
 
 def safe_truncate(s, max_width):
     truncated = ""
@@ -408,8 +428,8 @@ def safe_truncate(s, max_width):
 
 
 # --------------- PING BUS FEATURE --------------- #
-
-
+# Sends a PING request to a connected bus client by Bus ID.
+# Waits briefly for a response and displays the result in the UI.
 
 def ping_bus(stdscr):
     curses.echo()
@@ -455,7 +475,8 @@ def ping_bus(stdscr):
     stdscr.getch()
 
 # --------------- Bus Roll Section ----------- # 
-
+# Queries the database for all students assigned to a specific Bus ID
+# and displays the list in the terminal UI.
 
 def bus_roll_query(stdscr):
     curses.echo()
@@ -492,6 +513,8 @@ def bus_roll_query(stdscr):
     stdscr.getch()
 
 # --------------- Query Entire Database -------------# 
+# Displays all registered students from the database,
+# including their names and associated schools, in alphabetical order.
 
 def view_all_students(stdscr):
     stdscr.clear()
@@ -522,6 +545,8 @@ def view_all_students(stdscr):
 
 
 # --------------- Clear Database ------------# 
+# Deletes all student records from the database after confirmation.
+# Prompts the user and logs the operation result.
 
 def clear_all_students(stdscr):
     curses.echo()
@@ -556,6 +581,8 @@ def clear_all_students(stdscr):
     stdscr.getch()
 
 # --------------- CURSES UI --------------- #
+# Main curses-based UI loop for the server interface.
+# Displays menu options, handles user input, and shows real-time logs and status updates.
 
 def curses_main(stdscr):
     MIN_HEIGHT = 24
@@ -669,6 +696,10 @@ def curses_main(stdscr):
                     bus_roll_query(menu_win)
                 elif c == ord('8'):
                     return    
+
+# Entry point of the application.
+# Starts the server in a background thread and launches the curses UI.
+
 def main():
     server_thread = threading.Thread(target=start_server_thread, daemon=True)
     server_thread.start()
